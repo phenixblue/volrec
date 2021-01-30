@@ -1,3 +1,13 @@
 domain: storage.k8s.twr.dev
 repo: twr.dev/volrec
+resources:
+- group: core
+  kind: PersistentVolume
+  version: v1
+- group: core
+  kind: PersistentVolumeClaim
+  version: v1
+- group: core
+  kind: Namespace
+  version: v1
 version: "2"
