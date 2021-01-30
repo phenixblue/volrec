@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= jmsearcy/volrec:latest
+IMG ?= thewebroot/volrec:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
@@ -66,7 +66,7 @@ docker-push:
 
 # Restart all the pods
 restart: 
-	kubectl rollout restart deploy -n volrec-system volrec-controller-manager
+	kubectl rollout restart deploy -n volrec-system volrec-controller
 
 # Do all the things
 build: docker-build docker-push deploy restart
