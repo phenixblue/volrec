@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= jmsearcy/volrec:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
@@ -23,7 +23,9 @@ manager: generate fmt vet
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
-	go run ./main.go
+	go run ./main.go \
+	-set-owner \
+    -set-ns
 
 # Install CRDs into a cluster
 install: manifests
@@ -61,6 +63,13 @@ docker-build: test
 # Push the docker image
 docker-push:
 	docker push ${IMG}
+
+# Restart all the pods
+restart: 
+	kubectl rollout restart deploy -n volrec-system volrec-controller-manager
+
+# Do all the things
+build: docker-build docker-push deploy restart
 
 # find or download controller-gen
 # download controller-gen if necessary

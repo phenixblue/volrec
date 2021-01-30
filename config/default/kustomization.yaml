@@ -9,8 +9,8 @@ namespace: volrec-system
 namePrefix: volrec-
 
 # Labels to add to all resources and selectors.
-#commonLabels:
-#  someName: someValue
+commonLabels:
+  app: volrec
 
 bases:
 - ../crd

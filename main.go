@@ -28,6 +28,8 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"twr.dev/volrec/controllers"
+
+	c "twr.dev/volrec/pkg/config"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -50,7 +52,15 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	flag.String("reclaim-label", "storage.k8s.twr.dev/reclaim-policy", "The label to use for tracking Persistent Volume reclaim policy")
+	flag.Bool("set-owner", false, "Toggle whether or not owner information from a given namespace is transfered to the Persistent Volume")
+	flag.String("owner-label", "k8s.twr.dev/owner", "The Label to use to set owner information on a Persistent Volume")
+	flag.Bool("set-ns", false, "Toggle whether or not to add a label mapping Persistent Volumes back to a namespace")
+	flag.String("ns-label", "k8s.twr.dev/owning-namespace", "The label to use for identifying an owning namespace on a Persisent Volume")
+
 	flag.Parse()
+
+	c.InitConfig(setupLog)
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
@@ -91,6 +101,19 @@ func main() {
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
+
+	if _, err := mgr.GetCache().GetInformer(&corev1.Namespace{}); err != nil {
+		setupLog.Error(err, "unable to setup cache", "cache", "Namespace")
+		os.Exit(1)
+	}
+	if _, err := mgr.GetCache().GetInformer(&corev1.PersistentVolume{}); err != nil {
+		setupLog.Error(err, "unable to setup cache", "cache", "PersistentVolume")
+		os.Exit(1)
+	}
+	if _, err := mgr.GetCache().GetInformer(&corev1.PersistentVolumeClaim{}); err != nil {
+		setupLog.Error(err, "unable to setup cache", "cache", "PersistentVolumeClaim")
+		os.Exit(1)
+	}
 
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {

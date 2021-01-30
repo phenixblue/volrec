@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: volrec-config
+  namespace: volrec-system
+data:
+  config: |-
+    storage:
+      reclaim:
+        label: storage.k8s.twr.dev/reclaim-policy
+    owner:
+      label: k8s.twr.dev/owner
+      set-owner: true
+      set-ns: true

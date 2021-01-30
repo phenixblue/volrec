@@ -35,6 +35,13 @@ I'm basically running `make manifests` and `kustomize build config/default/` whi
     ```shell
     $ rm -rf ./api
     ```
+1. Remove API copy reference from `./Dockerfile`
+
+    Remove this line:
+
+    ```docker
+    COPY api/ api/
+    ```
 
 1. Cleanup config scaffolding
 
