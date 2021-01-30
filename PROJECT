@@ -1,0 +1,3 @@
+domain: storage.k8s.twr.dev
+repo: twr.dev/volrec
+version: "2"
