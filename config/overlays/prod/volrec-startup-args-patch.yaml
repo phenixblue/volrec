@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volrec-controller
+  namespace: volrec-system
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: volrec
+        command:
+        - /manager
+        args:
+        - --enable-leader-election
+        - --set-owner
+        - --set-ns

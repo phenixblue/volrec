@@ -40,6 +40,11 @@ deploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
 	kustomize build config/default | kubectl apply -f -
 
+# Deploy controller using the "Prod" example overlay
+deploy-prod: manifests
+	cd config/manager && kustomize edit set image controller=${IMG}
+	kustomize build config/overlays/prod | kubectl apply -f -
+
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
@@ -87,3 +92,19 @@ CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
+# Setup Test Namespace and artifacts
+test-setup:
+	kubectl create ns test1
+	kubectl label ns test1 k8s.twr.dev/owner="user1"
+	kubectl apply -f ./testing/kubernetes/crdb-sts.yaml -n test1
+
+set-reclaim-delete:
+	kubectl -n test1 label pvc --all storage.k8s.twr.dev/reclaim-policy=Delete --overwrite
+
+set-reclaim-retain:
+	kubectl -n test1 label pvc --all storage.k8s.twr.dev/reclaim-policy=Retain --overwrite
+
+set-reclaim-recycle:
+	kubectl -n test1 label pvc --all storage.k8s.twr.dev/reclaim-policy=Recycle --overwrite
+

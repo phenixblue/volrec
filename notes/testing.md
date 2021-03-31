@@ -1,21 +1,20 @@
 # Notes on Testing the volrec Controller
 
-## Create Test Namespace
+## Deploy Volrec
 
 ```shell
-$ kubectl create ns test1
+$ make deploy-prod
 ```
 
-## Label Namespace
+## Setup Test environment
+
+This creates a test namespace, applies appropriate labels, and deploys a sample Statefulset with dynamic PVC/PV's.
+
+The PVC claim wihtin the Statefulset is configured to set PV reclaim policy from to `Retain`.
+
 
 ```shell
-$ kubectl label ns test1 k8s.twr.dev/owner="user1"
-```
-
-## Deploy Test Statefulset
-
-```shell
-$ kubectl apply -f ./testing/kubernetes/crdb-sts.yaml -n test1
+$ make test-setup
 ```
 
 ## Check the logs of the controller
@@ -27,7 +26,9 @@ $ kubectl logs -n volrec-system -l app=volrec -c volrec -f
 ## Apply labels to PVC to change Reclaim Policy
 
 ```shell
-$ kubectl label pvc -n test1 datadir-crdb1-0 storage.k8s.twr.dev/reclaim-policy=Retain --overwrite
+$ make set-reclaim-delete
+$ make set-reclaim-recycle
+$ make set-reclaim-retain
 ```
 
 NOTE: The default Reclaim Policy could differ, so update the label value to something pertinent for your environment
